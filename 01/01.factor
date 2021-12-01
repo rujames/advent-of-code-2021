@@ -1,0 +1,16 @@
+! Copyright (C) 2021 Your name.
+! See http://factorcode.org/license.txt for BSD license.
+USING: io.files io.encodings.utf8 math math.parser kernel sequences ;
+IN: github.advent-of-code-2021.01
+
+: load-sweep ( -- xs ) "resource:work/github/advent-of-code-2021/01/01.input" utf8 file-lines [ string>number ] map ;
+
+: solve ( xs -- n )  dup rest [ < ] 2map [ ] count ;
+
+! Part 1
+
+: solve-1 ( -- n ) load-sweep solve ;
+
+! Part 2
+
+: solve-2 ( -- n ) load-sweep dup rest dup rest [ + + ] 3map solve ;
