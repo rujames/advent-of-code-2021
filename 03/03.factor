@@ -25,18 +25,17 @@ IN: github.advent-of-code-2021.03
 
 : nth= ( xs ys n -- ? ) [ swap nth ] curry bi@ = ;
 
+:: iterative-filter ( xs i quot -- xs ) i xs quot call( n xs -- xs ) {
+        { [ dup length 1 > ] [  1 i + quot iterative-filter ] }
+        [ ]
+    } cond ;
+
 : (oxygen) ( n xs -- xs ) [ most-common-bits swap [ nth= ] 2curry ] keep swap filter ;
 
-:: oxygen ( xs i -- n ) i xs (oxygen) {
-        { [ dup length 1 > ] [ 1 i + oxygen ] }
-        [ first binary>number ]
-    } cond ;
+: oxygen ( xs -- n )  0 [ (oxygen) ] iterative-filter first binary>number ;
 
 : (co2) ( n xs -- xs ) [ least-common-bits swap [ nth= ] 2curry ] keep swap filter ;
 
-:: co2 ( xs i -- n ) i xs (co2) {
-        { [ dup length 1 > ] [ 1 i + co2 ] }
-        [ first binary>number ]
-    } cond ;
+: co2 ( xs -- n ) 0 [ (co2) ] iterative-filter first binary>number ;
 
-: solve-2 ( -- n ) load-report [ 0 oxygen ] [ 0 co2 ] bi * ;
+: solve-2 ( -- n ) load-report [ oxygen ] [ co2 ] bi * ;
