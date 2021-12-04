@@ -14,17 +14,26 @@ IN: github.advent-of-code-2021.04
 
 : bingo? ( board i j -- ? ) pick swap [ row-bingo? ] [ column-bingo? ] 2bi* or ;
 
-:: ?board-index ( board n -- {ij}/f ) board [ [ first n = ] find drop ] find [ first n = ] find [ 2array ] [ drop drop f ] if ;
+:: ?board-index ( board n -- {ij}/f ) board
+    [ [ first n = ] find drop ] find
+    [ first n = ] find
+    [ 2array ]
+    [ drop drop f ]
+    if ;
 
 :: dab ( board n -- board ) board [ [ { n f } { n t } replace ] map ] map ;
 
-: turn ( board n -- board ? ) dup [ dab dup ] dip ?board-index dup [ [ dup ] dip first2 bingo? ] when ;
+:: split-winners ( boards n -- remaining winners ) boards
+    [ n dab ] map dup
+    [ n ?board-index ] filter
+    [ dup n ?board-index first2 bingo? ] filter
+    dup [ diff ] dip ;
 
-:: first-winner ( boards ns -- board n ) boards
-    [ ns first dab ] map dup
-    [ ns first ?board-index ] filter
-    [ dup ns first ?board-index first2 bingo? ] filter
-    dup empty? [ drop ns rest first-winner ] [ [ drop ] dip first ns first ] if ;
+:: first-winner ( boards ns -- board n ) boards ns first split-winners
+    dup empty?
+    [ drop ns rest first-winner ]
+    [ [ drop ] dip first ns first ]
+    if ;
 
 : score ( board n -- n ) [ concat [ second not ] filter [ first ] map sum ] dip * ;
 
@@ -34,10 +43,10 @@ IN: github.advent-of-code-2021.04
 
 ! Part 2
 
-:: last-winner ( boards ns -- board n ) boards
-    [ ns first dab ] map dup
-    [ ns first ?board-index ] filter
-    [ dup ns first ?board-index first2 bingo? ] filter
-    diff dup length 1 = [ first 1array ns rest first-winner ] [ ns rest last-winner ] if ;
+:: last-winner ( boards ns -- board n ) boards ns first split-winners
+    drop dup length 1 =
+    [ first 1array ns rest first-winner ]
+    [ ns rest last-winner ]
+    if ;
 
 : solve-2 ( -- n ) load-game last-winner score ;
