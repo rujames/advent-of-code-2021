@@ -12,8 +12,6 @@ IN: github.advent-of-code-2021.04
 
 : column-bingo? ( board j -- ? ) [ swap nth second ] curry all? ;
 
-: bingo? ( board i j -- ? ) pick swap [ row-bingo? ] [ column-bingo? ] 2bi* or ;
-
 :: ?board-index ( board n -- {ij}/f ) board
     [ [ first n = ] find drop ] find
     [ first n = ] find
@@ -21,13 +19,17 @@ IN: github.advent-of-code-2021.04
     [ drop drop f ]
     if ;
 
+: bingo? ( board n -- ? ) dupd ?board-index
+    [ first2 pick swap [ row-bingo? ] [ column-bingo? ] 2bi* or ]
+    [ drop f ]
+    if* ;
+
 :: dab ( board n -- board ) board [ [ { n f } { n t } replace ] map ] map ;
 
 :: split-winners ( boards n -- remaining winners ) boards
     [ n dab ] map dup
-    [ n ?board-index ] filter
-    [ dup n ?board-index first2 bingo? ] filter
-    dup [ diff ] dip ;
+    [ n bingo? ] filter
+    [ diff ] keep ;
 
 :: first-winner ( boards ns -- board n ) boards ns first split-winners
     dup empty?
