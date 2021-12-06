@@ -6,3 +6,5 @@ IN: github.advent-of-code-2021.common
 : puzzle-input-path ( s -- s ) { "resource:work/github/advent-of-code-2021/" "/" ".input" } swap join ;
 
 : puzzle-input-lines ( s -- xs ) puzzle-input-path utf8 file-lines ;
+
+: puzzle-input ( s -- s ) puzzle-input-path utf8 file-contents ;
