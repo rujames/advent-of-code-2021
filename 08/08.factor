@@ -9,6 +9,8 @@ IN: github.advent-of-code-2021.08
 
 ! Part 2
 
+:: (set-n) ( xs n m -- m ) n xs first 2array 1array m append ;
+
 : unique-lengths ( xs -- m )
     {
         [ [ 1 ] dip [ length 2 = ] filter first 2array ]
@@ -16,38 +18,44 @@ IN: github.advent-of-code-2021.08
         [ [ 4 ] dip [ length 4 = ] filter first 2array ]
         [ [ 8 ] dip [ length 7 = ] filter first 2array ]
     } cleave>array ;
-    
-:: set-three ( m xs -- m ) 3 xs [
+
+! Three is the only 5-segment which contains 7
+:: set-three ( m xs -- m ) xs [
         [ length 5 = ]
         [ 7 m at swap subset? ]
         bi and
-    ] filter first 2array 1array m append ;
+    ] filter 3 m (set-n) ;
 
-:: set-nine ( m xs -- m ) 9 xs [
+! Nine is the only 6-segment to contain both 7 and 4
+:: set-nine ( m xs -- m ) xs [
         [ length 6 = ]
         [ [ 7 m at swap subset? ] [ 4 m at swap subset? ] bi and ]
         bi and
-    ] filter first 2array 1array m append ;
+    ] filter 9 m (set-n) ;
 
-:: set-six ( m xs -- m ) 6 xs [
+! Six is the only 6-segment to contain neither 7 nor 1
+:: set-six ( m xs -- m ) xs [
         [ length 6 = ]
         [ [ 7 m at swap subset? not ] [ 1 m at swap subset? not ] bi and ]
         bi and
-    ] filter first 2array 1array m append ;
+    ] filter 6 m (set-n) ;
 
-:: set-zero ( m xs -- m ) 0 xs [
+! Zero is the only 6-segment to contain 7 but not 4
+:: set-zero ( m xs -- m ) xs [
         [ length 6 = ]
         [ [ 7 m at swap subset? ] [ 4 m at swap subset? not ] bi and ]
         bi and
-    ] filter first 2array 1array m append ;
+    ] filter 0 m (set-n) ;
 
-:: set-two ( m xs -- m ) 2 xs [
+! Two is the only 5-segment to contain the complement of 4
+:: set-two ( m xs -- m ) xs [
         [ length 5 = ]
         [ 8 m at 4 m at diff swap subset? ]
         bi and
-    ] filter first 2array 1array m append ;
+    ] filter 2 m (set-n) ;
 
-:: set-five ( m xs -- m ) 5 xs m values diff first 2array 1array m append ;
+! Five is what's left after we've found the rest of them :)
+:: set-five ( m xs -- m ) xs m values diff 5 m (set-n) ;
 
 : signal-mapping ( xs -- m ) first
     [ unique-lengths ] keep
