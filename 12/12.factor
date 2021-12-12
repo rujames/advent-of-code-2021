@@ -36,24 +36,26 @@ IN: github.advent-of-code-2021.12
         { [ from to = ] [ { { } } ] }
         { [ es from star null? ] [ { } ] }
         [ from large?
-          [ es from link [| v | es v to paths [ { { from v } } swap append ] map ] map concat ]
-          [ es from link [| v | es from excise v to paths [ { { from v } } swap append ] map ] map concat ]
+          [ es from link [| v | es v to paths [ { { from v } } prepend ] map ] map concat ]
+          [ es from link [| v | es from excise v to paths [ { { from v } } prepend ] map ] map concat ]
           if
         ]
     } cond ;
+
+:: loops ( es v -- ps ) es v link [| w | es w v paths [ { { v w } } prepend ] map ] map concat ;
 
 :: scenic-paths ( es from to -- ps )
     {
         { [ from to = ] [ { { } } ] }
         { [ es from star null? ] [ { } ] }
         [ from large?
-          [ es from link [| v | es v to scenic-paths [ { { from v } } swap append ] map ] map concat ]
+          [ es from link [| v | es v to scenic-paths [ { { from v } } prepend ] map ] map concat ]
           [
-              es from link [| v | es from excise v to scenic-paths [ { { from v } } swap append ] map ] map concat
-              es from link [| v | es v from paths [ { { from v } } swap append ] map ] map concat
-              [| path |
-               path concat members [ [ large? ] [ from = ] bi or not ] filter es [ excise ] reduce from to paths
-               [ path swap append ] map
+              es from link [| v | es from excise v to scenic-paths [ { { from v } } prepend ] map ] map concat
+              es from loops
+              [| loop |
+               loop concat members [ [ large? ] [ from = ] bi or not ] filter es [ excise ] reduce from to paths
+               [ loop prepend ] map
               ] map concat
               append
           ]
